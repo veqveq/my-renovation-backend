@@ -1,0 +1,36 @@
+server:
+  port: ${MR_SERVICE_PORT}
+  error:
+    include-message: always
+
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        default_schema: ${MR_SERVICE_DB_SCHEMA}
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml
+    default-schema: ${spring.jpa.properties.hibernate.default_schema}
+    parameters:
+      schema: ${spring.jpa.properties.hibernate.default_schema}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${MR_DB_HOST}:${MR_DB_PORT}/${MR_DB_NAME}
+    username: ${MR_DB_USER}
+    password: ${MR_DB_PASSWORD}
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 10
+      initialization-fail-timeout: 1
+      leak-detection-threshold: 0
+      pool-name: Hikari [Tables Service]
+      register-mbeans: true

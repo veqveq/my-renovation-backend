@@ -1,0 +1,19 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:14.2
+    container_name: mr-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${MR_DB_NAME}
+      POSTGRES_USER: ${MR_DB_USER}
+      POSTGRES_PASSWORD: ${MR_DB_PASSWORD}
+    ports:
+      - "${MR_DB_PORT}:5432"
+    volumes:
+      - ./deploy/sql/script/init-schemas.sql:/docker-entrypoint-initdb.d/init-schemas.sql
+    networks:
+      - mr-net
+
+networks:
+  mr-net:
