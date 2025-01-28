@@ -39,5 +39,10 @@
         <groupId>org.mapstruct</groupId>
         <artifactId>mapstruct</artifactId>
     </dependency>
+    <dependency>
+        <groupId>ru.veqveq</groupId>
+        <artifactId>my-renovation-common</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
 </dependencies>
 </project>

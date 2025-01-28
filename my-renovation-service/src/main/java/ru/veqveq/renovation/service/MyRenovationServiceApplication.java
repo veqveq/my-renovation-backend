@@ -1,4 +1,4 @@
-package ru.veqveq.renovation;
+package ru.veqveq.renovation.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
