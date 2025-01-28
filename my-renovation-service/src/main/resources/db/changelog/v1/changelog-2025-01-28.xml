@@ -1,0 +1,155 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet id="20250128-1" author="e.vasyakov">
+        <!--Проект ремонта-->
+        <createSequence sequenceName="project_seq" startValue="1"/>
+        <createTable tableName="project" remarks="Проект ремонта">
+            <column name="project_id"
+                    type="bigint"
+                    remarks="Идентификатор"
+                    defaultValueSequenceNext="project_seq">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text" remarks="Описание"/>
+            <column name="address" type="text" remarks="Адрес объекта"/>
+        </createTable>
+
+        <!--Этап работ-->
+        <createSequence sequenceName="project_stage_seq" startValue="1"/>
+        <createTable tableName="project_stage" remarks="Этап ремонта">
+            <column name="project_stage_id"
+                    type="bigint"
+                    remarks="Идентификатор"
+                    defaultValueSequenceNext="project_stage_seq">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="text" remarks="Комментарий"/>
+            <column name="project_id" type="bigint" remarks="Идентификатор проекта ремонта">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="project_stage" baseColumnNames="project_id"
+                                 constraintName="fk_project_stage_project"
+                                 referencedTableName="project"
+                                 referencedColumnNames="project_id"/>
+
+        <!--Описание строительной работы-->
+        <createSequence sequenceName="work_seq" startValue="1"/>
+        <createTable tableName="work" remarks="Работа">
+            <column name="work_id"
+                    type="bigint"
+                    remarks="Идентификатор"
+                    defaultValueSequenceNext="work_seq">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit" type="varchar(50)" remarks="Единица измерения">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_work_id" type="bigint" remarks="Идентификатор родительской работы"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="work" baseColumnNames="parent_work_id"
+                                 constraintName="fk_work_parent_work"
+                                 referencedTableName="work"
+                                 referencedColumnNames="work_id"/>
+
+        <!--Описание строительного материала-->
+        <createSequence sequenceName="material_seq" startValue="1"/>
+        <createTable tableName="material" remarks="Материалы">
+            <column name="material_id"
+                    type="bigint"
+                    remarks="Идентификатор"
+                    defaultValueSequenceNext="material_seq">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text" remarks="Название">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit" type="varchar(50)" remarks="Единица измерения">
+                <constraints nullable="false"/>
+            </column>
+            <column name="work_id" type="bigint" remarks="Идентификатор работы"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="material" baseColumnNames="work_id"
+                                 constraintName="fk_material_work"
+                                 referencedTableName="work"
+                                 referencedColumnNames="work_id"/>
+
+        <!--Работа по проекту-->
+        <createSequence sequenceName="project_work_seq" startValue="1"/>
+        <createTable tableName="project_work" remarks="Работа по проекту">
+            <column name="project_work_id"
+                    type="bigint"
+                    remarks="Идентификатор"
+                    defaultValueSequenceNext="project_work_seq">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="count" type="int" remarks="Объем"/>
+            <column name="price_cents" type="bigint" remarks="Цена за единицу (в центах)"/>
+            <column name="comment" type="text" remarks="Комментарий"/>
+            <column name="work_id" type="bigint" remarks="Идентификатор работы">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint" remarks="Идентификатор проекта ремонта">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_stage_id" type="bigint" remarks="Идентификатор стадии ремонта"/>
+            <column name="parent_project_work_id" type="bigint" remarks="Идентификатор родительской работы"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="project_work" baseColumnNames="project_id"
+                                 constraintName="fk_project_work_project"
+                                 referencedTableName="project"
+                                 referencedColumnNames="project_id"/>
+        <addForeignKeyConstraint baseTableName="project_work" baseColumnNames="project_stage_id"
+                                 constraintName="fk_project_work_project_stage"
+                                 referencedTableName="project_stage"
+                                 referencedColumnNames="project_stage_id"/>
+        <addForeignKeyConstraint baseTableName="project_work" baseColumnNames="parent_project_work_id"
+                                 constraintName="fk_project_work_parent_project_work"
+                                 referencedTableName="project_work"
+                                 referencedColumnNames="project_work_id"/>
+
+        <!--Материал по проекту-->
+        <createSequence sequenceName="project_material_seq" startValue="1"/>
+        <createTable tableName="project_material" remarks="Материал по проекту">
+            <column name="project_material_id"
+                    type="bigint"
+                    remarks="Идентификатор"
+                    defaultValueSequenceNext="project_material_seq">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="count" type="int" remarks="Объем"/>
+            <column name="price_cents" type="bigint" remarks="Цена за единицу (в центах)"/>
+            <column name="comment" type="text" remarks="Комментарий"/>
+            <column name="material_id" type="bigint" remarks="Идентификатор материала">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint" remarks="Идентификатор проекта ремонта">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_stage_id" type="bigint" remarks="Идентификатор стадии ремонта"/>
+            <column name="project_work_id" type="bigint" remarks="Идентификатор работы по проекту"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="project_material" baseColumnNames="project_id"
+                                 constraintName="fk_project_material_project"
+                                 referencedTableName="project"
+                                 referencedColumnNames="project_id"/>
+        <addForeignKeyConstraint baseTableName="project_material" baseColumnNames="project_stage_id"
+                                 constraintName="fk_project_material_project_stage"
+                                 referencedTableName="project_stage"
+                                 referencedColumnNames="project_stage_id"/>
+        <addForeignKeyConstraint baseTableName="project_material" baseColumnNames="project_work_id"
+                                 constraintName="fk_project_material_project_work"
+                                 referencedTableName="project_work"
+                                 referencedColumnNames="project_work_id"/>
+    </changeSet>
+</databaseChangeLog>
