@@ -2,6 +2,8 @@ server:
   port: ${MR_SERVICE_PORT}
   error:
     include-message: always
+#  servlet:
+#    context-path: /mr/api/v1
 
 spring:
   jpa:
@@ -34,3 +36,10 @@ spring:
       leak-detection-threshold: 0
       pool-name: Hikari [My Renovation Service]
       register-mbeans: true
+
+#springdoc:
+#  swagger-ui:
+#    path: /v1/api-docs/index.html
+#    disable-swagger-default-url: true
+#  api-docs:
+#    path: /v1/api-docs
