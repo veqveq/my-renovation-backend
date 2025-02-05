@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.veqveq.renovation.entity.BaseNamedEntity;
+import ru.veqveq.renovation.entity.AuditedEntity;
 import ru.veqveq.renovation.model.MeasureUnit;
 
 /**
@@ -16,7 +16,17 @@ import ru.veqveq.renovation.model.MeasureUnit;
 @NoArgsConstructor
 @Table(name = "material")
 @AttributeOverride(name = "id", column = @Column(name = "material_id"))
-public class Material extends BaseNamedEntity<Long> {
+public class DictionaryMaterial extends AuditedEntity<Long> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
+
+    /**
+     * Название
+     */
+    @Column(name = "name")
+    private String name;
+
     /**
      * Единица измерения
      */
@@ -29,5 +39,5 @@ public class Material extends BaseNamedEntity<Long> {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_id")
-    private Work work;
+    private DictionaryWork work;
 }

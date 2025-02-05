@@ -1,0 +1,149 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <changeSet id="20250203-1" author="e.vasyakov">
+        <!--Проект ремонта-->
+        <addColumn tableName="project">
+            <column name="deleted" type="bool" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" remarks="Время создания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" remarks="Время изменения">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!--Этап работ-->
+        <addColumn tableName="project_stage">
+            <column name="order_number" type="int" remarks="Номер стадии">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted" type="bool" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" remarks="Время создания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" remarks="Время изменения">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            CREATE UNIQUE INDEX idx_project_stage_order_number_project_uniq 
+                ON project_stage(order_number, project_id) 
+                WHERE deleted IS FALSE;
+        </sql>
+
+        <!--Описание строительной работы-->
+        <addColumn tableName="work">
+            <column name="order_number" type="int" remarks="Номер стадии"/>
+            <column name="created_at" type="timestamp" remarks="Время создания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" remarks="Время изменения">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            CREATE UNIQUE INDEX idx_work_order_number_parent_work_uniq
+                ON work(order_number, parent_work_id)
+                WHERE parent_work_id IS NOT NULL
+                  AND order_number IS NOT NULL;
+        </sql>
+
+        <!--Описание строительного материала-->
+        <addColumn tableName="material">
+            <column name="created_at" type="timestamp" remarks="Время создания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" remarks="Время изменения">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!--Работа по проекту-->
+        <addColumn tableName="project_work">
+            <column name="order_number" type="int" remarks="Номер стадии">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted" type="bool" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" remarks="Время создания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" remarks="Время изменения">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>
+            CREATE UNIQUE INDEX idx_project_work_order_number_project_uniq
+                ON project_work(order_number, project_id)
+                WHERE deleted IS FALSE
+                  AND project_id IS NOT NULL;
+            CREATE UNIQUE INDEX idx_project_work_order_number_project_stage_uniq
+                ON project_work(order_number, project_stage_id)
+                WHERE deleted IS FALSE
+                  AND project_stage_id IS NOT NULL;
+            CREATE UNIQUE INDEX idx_project_work_order_number_parent_project_work_uniq
+                ON project_work(order_number, parent_project_work_id)
+                WHERE deleted IS FALSE
+                  AND parent_project_work_id IS NOT NULL;
+        </sql>
+
+        <!--Материал по проекту-->
+        <addColumn tableName="project_material">
+            <column name="deleted" type="bool" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" remarks="Время создания">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" remarks="Время изменения">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!--Rollback-->
+        <rollback>
+            <dropColumn tableName="project">
+                <column name="deleted"/>
+                <column name="created_at"/>
+                <column name="updated_at"/>
+            </dropColumn>
+            <dropColumn tableName="project_stage">
+                <column name="order_number"/>
+                <column name="deleted"/>
+                <column name="created_at"/>
+                <column name="updated_at"/>
+            </dropColumn>
+            <dropColumn tableName="work">
+                <column name="order_number"/>
+                <column name="created_at"/>
+                <column name="updated_at"/>
+            </dropColumn>
+            <dropColumn tableName="material">
+                <column name="created_at"/>
+                <column name="updated_at"/>
+            </dropColumn>
+            <dropColumn tableName="project_work">
+                <column name="order_number"/>
+                <column name="deleted"/>
+                <column name="created_at"/>
+                <column name="updated_at"/>
+            </dropColumn>
+            <dropColumn tableName="project_material">
+                <column name="deleted"/>
+                <column name="created_at"/>
+                <column name="updated_at"/>
+            </dropColumn>
+            <dropIndex tableName="project_stage" indexName="idx_project_stage_order_number_project_uniq"/>
+            <dropIndex tableName="work" indexName="idx_work_order_number_parent_work_uniq"/>
+            <dropIndex tableName="project_work" indexName="idx_project_work_order_number_project_uniq"/>
+            <dropIndex tableName="project_work" indexName="idx_project_work_order_number_project_stage_uniq"/>
+            <dropIndex tableName="project_work" indexName="idx_project_work_order_number_parent_project_work_uniq"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

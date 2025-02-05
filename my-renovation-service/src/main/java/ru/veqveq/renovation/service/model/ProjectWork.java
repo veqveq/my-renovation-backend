@@ -1,12 +1,21 @@
 package ru.veqveq.renovation.service.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.veqveq.renovation.entity.BaseIdEntity;
-
-import java.util.List;
+import ru.veqveq.renovation.entity.AuditedEntity;
 
 /**
  * Работа по проекту
@@ -17,7 +26,11 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "project_work")
 @AttributeOverride(name = "id", column = @Column(name = "project_work_id"))
-public class ProjectWork extends BaseIdEntity<Long> {
+public class ProjectWork extends AuditedEntity<Long> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
+
     /**
      * Объем работы
      */
@@ -37,11 +50,23 @@ public class ProjectWork extends BaseIdEntity<Long> {
     private String comment;
 
     /**
+     * Порядковый номер
+     */
+    @Column(name = "order_number")
+    private Integer orderNumber;
+
+    /**
+     * Признак логического удаления
+     */
+    @Column(name = "deleted")
+    private boolean deleted;
+
+    /**
      * Работа
      */
     @ManyToOne
     @JoinColumn(name = "work_id")
-    private Work work;
+    private DictionaryWork work;
 
     /**
      * Проект ремонта
@@ -67,6 +92,12 @@ public class ProjectWork extends BaseIdEntity<Long> {
     /**
      * Список цен на материалы для работы
      */
-    @OneToMany(mappedBy = "projectWork")
-    private List<ProjectMaterial> projectMaterialList;
+    @OneToMany(mappedBy = "projectWork", fetch = FetchType.LAZY)
+    private List<ProjectMaterial> projectMaterials;
+
+    /**
+     * Список стадий работы по проекту
+     */
+    @OneToMany(mappedBy = "parentProjectWork", fetch = FetchType.LAZY)
+    private List<ProjectWork> childProjectWorks;
 }

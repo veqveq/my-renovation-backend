@@ -2,10 +2,12 @@ server:
   port: ${MR_SERVICE_PORT}
   error:
     include-message: always
-#  servlet:
-#    context-path: /mr/api/v1
+  servlet:
+    context-path: /mr/api/${spring.application.api-version}
 
 spring:
+  application:
+    api-version: "v1"
   jpa:
     show-sql: false
     properties:
@@ -37,9 +39,15 @@ spring:
       pool-name: Hikari [My Renovation Service]
       register-mbeans: true
 
-#springdoc:
-#  swagger-ui:
-#    path: /v1/api-docs/index.html
-#    disable-swagger-default-url: true
-#  api-docs:
-#    path: /v1/api-docs
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+    disable-swagger-default-url: true
+
+logging:
+  level:
+    web: INFO
+    org:
+      springframework:
+        web: INFO

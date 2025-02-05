@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.veqveq.renovation.entity.AuditedEntity;
 import ru.veqveq.renovation.entity.BaseIdEntity;
 
 
@@ -16,7 +17,11 @@ import ru.veqveq.renovation.entity.BaseIdEntity;
 @NoArgsConstructor
 @Table(name = "project_material")
 @AttributeOverride(name = "id", column = @Column(name = "project_material_id"))
-public class ProjectMaterial extends BaseIdEntity<Long> {
+public class ProjectMaterial extends AuditedEntity<Long> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
+
     /**
      * Объем
      */
@@ -36,11 +41,17 @@ public class ProjectMaterial extends BaseIdEntity<Long> {
     private String comment;
 
     /**
+     * Признак логического удаления
+     */
+    @Column(name = "deleted")
+    private boolean deleted;
+
+    /**
      * Материал
      */
     @ManyToOne
     @JoinColumn(name = "material_id")
-    private Material material;
+    private DictionaryMaterial material;
 
     /**
      * Проект ремонта
